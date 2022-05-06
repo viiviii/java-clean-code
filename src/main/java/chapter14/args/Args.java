@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.util.*;
 
 public class Args {
-    private String scheme;
+    private String schema;
     private String[] args;
     private boolean valid = true;
     private Set<Character> unexpectedArguments = new TreeSet<>();
@@ -21,13 +21,13 @@ public class Args {
     private ErrorCode errorCode = ErrorCode.OK;
 
     public Args(String schema, String[] args) throws ParseException {
-        this.scheme = schema;
+        this.schema = schema;
         this.args = args;
         valid = parse();
     }
 
     private boolean parse() throws ParseException {
-        if (scheme.length() == 0 && args.length == 0)
+        if (schema.length() == 0 && args.length == 0)
             return true;
         parseSchema();
         parseArguments();
@@ -35,7 +35,7 @@ public class Args {
     }
 
     private boolean parseSchema() throws ParseException {
-        for (String element : scheme.split(",")) {
+        for (String element : schema.split(",")) {
             if (element.length() > 0) {
                 String trimmedElement = element.trim();
                 parseSchemaElement(trimmedElement);
@@ -57,7 +57,7 @@ public class Args {
     private void validateSchemaElementId(char elementId) throws ParseException {
         if (!Character.isLetter(elementId)) {
             throw new ParseException(
-                    "Bad character: " + elementId + " in Args format: " + scheme, 0);
+                    "Bad character: " + elementId + " in Args format: " + schema, 0);
         }
     }
 
@@ -145,8 +145,8 @@ public class Args {
     }
 
     public String usage() {
-        if (scheme.length() > 0)
-            return "-[" + scheme + "]";
+        if (schema.length() > 0)
+            return "-[" + schema + "]";
         else
             return "";
     }

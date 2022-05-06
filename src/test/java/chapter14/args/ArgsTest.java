@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.catchException;
 
 class ArgsTest {
 
-    @DisplayName("scheme와 arguments가 없는 경우")
+    @DisplayName("schema와 arguments가 없는 경우")
     @Test
     void noSchemaAndArguments() throws Exception {
         //given
@@ -25,7 +25,7 @@ class ArgsTest {
         assertThat(args.cardinality()).isZero();
     }
 
-    @DisplayName("scheme가 없고 argument가 1개 있는 경우")
+    @DisplayName("schema가 없고 argument가 1개 있는 경우")
     @Test
     void noSchemaButWithOneArgument() throws Exception {
         //given
@@ -41,7 +41,7 @@ class ArgsTest {
         assertThat(args.errorMessage()).isEqualTo("Argument(s) -x unexpected.");
     }
 
-    @DisplayName("scheme가 없고 argument가 여러 개 있는 경우")
+    @DisplayName("schema가 없고 argument가 여러 개 있는 경우")
     @Test
     void noSchemaButWithMultipleArguments() throws Exception {
         //given
