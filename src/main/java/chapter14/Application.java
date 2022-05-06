@@ -1,6 +1,8 @@
 package chapter14;
 
-public class Application {
+import chapter14.args.Args;
+
+class Application {
 
     public static void main(String[] args) {
         Args arg = new Args("l", args);
