@@ -7,27 +7,51 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ApplicationTest extends MainMethodTest {
 
     @Test
-    void validBooleanArgs() {
+    void booleanArguments() {
         //given
-        String arg = "-l";
+        String[] args = new String[]{"-l"};
 
         //when
-        runMain(arg);
+        runMain(args);
 
         //then
-        assertThat(output()).contains("logging: true");
+        assertThat(output()).contains("true");
     }
 
     @Test
-    void invalidBooleanArgs() {
+    void stringArguments() {
         //given
-        String notStartWithHyphen = "l";
+        String[] args = new String[]{"-d", "root"};
 
         //when
-        runMain(notStartWithHyphen);
+        runMain(args);
 
         //then
-        assertThat(output()).contains("logging: false");
+        assertThat(output()).contains("root");
+    }
+
+    @Test
+    void allArgumentsPresent() {
+        //given
+        String[] args = new String[]{"-l", "-d", "user"};
+
+        //when
+        runMain(args);
+
+        //then
+        assertThat(output()).isEqualTo("logging: true, directory: user");
+    }
+
+    @Test
+    void noArguments() {
+        //given
+        String[] args = new String[0];
+
+        //when
+        runMain(args);
+
+        //then
+        assertThat(output()).isEqualTo("logging: false, directory:");
     }
 
     @Override
