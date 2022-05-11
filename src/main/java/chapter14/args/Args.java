@@ -10,12 +10,14 @@ public class Args {
     private Set<Character> unexpectedArguments = new TreeSet<>();
     private Map<Character, Boolean> booleanArgs = new HashMap<>();
     private Map<Character, String> stringArgs = new HashMap<>();
+    private Map<Character, Integer> intArgs = new HashMap<>();
     private Set<Character> argsFound = new HashSet<>();
     private int currentArgument;
     private char errorArgument = '\0';
+    private String errorParameter = "TILT";
 
     enum ErrorCode {
-        OK, MISSING_STRING
+        OK, MISSING_STRING, MISSING_INTEGER, INVALID_INTEGER
     }
 
     private ErrorCode errorCode = ErrorCode.OK;
@@ -52,6 +54,8 @@ public class Args {
             parseBooleanSchemaElement(elementId);
         else if (isStringSchemaElement(elementTail))
             parseStringSchemaElement(elementId);
+        else if (isIntegerSchemaElement(elementTail))
+            parseIntegerSchemaElement(elementId);
     }
 
     private void validateSchemaElementId(char elementId) throws ParseException {
@@ -75,6 +79,14 @@ public class Args {
 
     private void parseBooleanSchemaElement(char elementId) {
         booleanArgs.put(elementId, false);
+    }
+
+    private void parseIntegerSchemaElement(char elementId) {
+        intArgs.put(elementId, 0);
+    }
+
+    private boolean isIntegerSchemaElement(String elementTail) {
+        return elementTail.equals("#");
     }
 
     private boolean parseArguments() {
@@ -109,6 +121,8 @@ public class Args {
         boolean set = true;
         if (isBoolean(argChar))
             setBooleanArg(argChar, true);
+        else if (isInt(argChar))
+            setIntArg(argChar, 0);
         else if (isString(argChar))
             setStringArg(argChar, "");
         else
@@ -125,6 +139,28 @@ public class Args {
             valid = false;
             errorArgument = argChar;
             errorCode = ErrorCode.MISSING_STRING;
+        }
+    }
+
+    private boolean isInt(char argChar) {
+        return intArgs.containsKey(argChar);
+    }
+
+    private void setIntArg(char argChar, int value) {
+        currentArgument++;
+        String parameter = null;
+        try {
+            parameter = args[currentArgument];
+            intArgs.put(argChar, new Integer(parameter));
+        } catch (ArrayIndexOutOfBoundsException e) {
+            valid = false;
+            errorArgument = argChar;
+            errorCode = ErrorCode.MISSING_INTEGER;
+        } catch (NumberFormatException e) {
+            valid = false;
+            errorArgument = argChar;
+            errorParameter = parameter;
+            errorCode = ErrorCode.INVALID_INTEGER;
         }
     }
 
@@ -159,6 +195,12 @@ public class Args {
                 case MISSING_STRING:
                     return String.format("Could not find string parameter for -%c.",
                             errorArgument);
+                case INVALID_INTEGER:
+                    return String.format("Argument -%c expects an integer but was '%s'.",
+                            errorArgument, errorParameter);
+                case MISSING_INTEGER:
+                    return String.format("Could not find integer parameter for -%c.",
+                            errorArgument);
                 case OK:
                     throw new Exception("TILT: Should not get here.");
             }
@@ -182,6 +224,15 @@ public class Args {
 
     private boolean falseIfNull(Boolean b) {
         return b == null ? false : b;
+    }
+
+
+    public int getInt(char arg) {
+        return zeroIfNull(intArgs.get(arg));
+    }
+
+    private int zeroIfNull(Integer i) {
+        return i == null ? 0 : i;
     }
 
     public String getString(char arg) {
