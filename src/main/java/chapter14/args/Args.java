@@ -127,7 +127,7 @@ public class Args {
 
     private boolean setArgument(char argChar) throws ArgsException {
         if (isBooleanArg(argChar))
-            setBooleanArg(argChar, true);
+            setBooleanArg(argChar);
         else if (isStringArg(argChar))
             setStringArg(argChar);
         else if (isIntArg(argChar))
@@ -177,8 +177,8 @@ public class Args {
         return stringArgs.containsKey(argChar);
     }
 
-    private void setBooleanArg(char argChar, boolean value) {
-        booleanArgs.get(argChar).setBoolean(value);
+    private void setBooleanArg(char argChar) {
+        booleanArgs.get(argChar).set("true");
     }
 
     private boolean isBooleanArg(char argChar) {
@@ -238,7 +238,7 @@ public class Args {
 
     public boolean getBoolean(char arg) {
         ArgumentMarshaler am = booleanArgs.get(arg);
-        return am != null && am.getBoolean();
+        return am != null && (Boolean) am.get();
     }
 
     public boolean has(char arg) {
@@ -252,18 +252,9 @@ public class Args {
     private class ArgsException extends Exception {
     }
 
-    private class ArgumentMarshaler {
-        private boolean booleanValue = false;
+    private abstract class ArgumentMarshaler {
         private String stringValue;
         private int integerValue;
-
-        public void setBoolean(boolean value) {
-            this.booleanValue = value;
-        }
-
-        public boolean getBoolean() {
-            return booleanValue;
-        }
 
         public void setString(String value) {
             stringValue = value;
@@ -280,9 +271,24 @@ public class Args {
         public int getInteger() {
             return integerValue;
         }
+
+        public abstract void set(String s);
+
+        public abstract Object get();
     }
 
     private class BooleanArgumentMarshaler extends ArgumentMarshaler {
+        private boolean booleanValue = false;
+
+        @Override
+        public void set(String s) {
+            booleanValue = true;
+        }
+
+        @Override
+        public Object get() {
+            return booleanValue;
+        }
     }
 
     private class StringArgumentMarshaler extends ArgumentMarshaler {
