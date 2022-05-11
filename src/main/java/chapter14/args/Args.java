@@ -15,12 +15,11 @@ public class Args {
     private int currentArgument;
     private char errorArgument = '\0';
     private String errorParameter = "TILT";
+    private ErrorCode errorCode = ErrorCode.OK;
 
     enum ErrorCode {
         OK, MISSING_STRING, MISSING_INTEGER, INVALID_INTEGER
     }
-
-    private ErrorCode errorCode = ErrorCode.OK;
 
     public Args(String schema, String[] args) throws ParseException {
         this.schema = schema;
@@ -70,6 +69,14 @@ public class Args {
         }
     }
 
+    private void parseBooleanSchemaElement(char elementId) {
+        booleanArgs.put(elementId, false);
+    }
+
+    private void parseIntegerSchemaElement(char elementId) {
+        intArgs.put(elementId, 0);
+    }
+
     private void parseStringSchemaElement(char elementId) {
         stringArgs.put(elementId, "");
     }
@@ -80,14 +87,6 @@ public class Args {
 
     private boolean isBooleanSchemaElement(String elementTail) {
         return elementTail.length() == 0;
-    }
-
-    private void parseBooleanSchemaElement(char elementId) {
-        booleanArgs.put(elementId, false);
-    }
-
-    private void parseIntegerSchemaElement(char elementId) {
-        intArgs.put(elementId, 0);
     }
 
     private boolean isIntegerSchemaElement(String elementTail) {
@@ -123,35 +122,23 @@ public class Args {
     }
 
     private boolean setArgument(char argChar) {
-        boolean set = true;
-        if (isBoolean(argChar))
+        if (isBooleanArg(argChar))
             setBooleanArg(argChar, true);
-        else if (isInt(argChar))
-            setIntArg(argChar, 0);
-        else if (isString(argChar))
-            setStringArg(argChar, "");
+        else if (isStringArg(argChar))
+            setStringArg(argChar);
+        else if (isIntArg(argChar))
+            setIntArg(argChar);
         else
-            set = false;
+            return false;
 
-        return set;
+        return true;
     }
 
-    private void setStringArg(char argChar, String s) {
-        currentArgument++;
-        try {
-            stringArgs.put(argChar, args[currentArgument]);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            valid = false;
-            errorArgument = argChar;
-            errorCode = ErrorCode.MISSING_STRING;
-        }
-    }
-
-    private boolean isInt(char argChar) {
+    private boolean isIntArg(char argChar) {
         return intArgs.containsKey(argChar);
     }
 
-    private void setIntArg(char argChar, int value) {
+    private void setIntArg(char argChar) {
         currentArgument++;
         String parameter = null;
         try {
@@ -169,7 +156,18 @@ public class Args {
         }
     }
 
-    private boolean isString(char argChar) {
+    private void setStringArg(char argChar) {
+        currentArgument++;
+        try {
+            stringArgs.put(argChar, args[currentArgument]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            valid = false;
+            errorArgument = argChar;
+            errorCode = ErrorCode.MISSING_STRING;
+        }
+    }
+
+    private boolean isStringArg(char argChar) {
         return stringArgs.containsKey(argChar);
     }
 
@@ -177,7 +175,7 @@ public class Args {
         booleanArgs.put(argChar, value);
     }
 
-    private boolean isBoolean(char argChar) {
+    private boolean isBooleanArg(char argChar) {
         return booleanArgs.containsKey(argChar);
     }
 
@@ -197,6 +195,8 @@ public class Args {
             return unexpectedArgumentMessage();
         } else {
             switch (errorCode) {
+                case OK:
+                    throw new Exception("TILT: Should not get here.");
                 case MISSING_STRING:
                     return String.format("Could not find string parameter for -%c.",
                             errorArgument);
@@ -206,8 +206,6 @@ public class Args {
                 case MISSING_INTEGER:
                     return String.format("Could not find integer parameter for -%c.",
                             errorArgument);
-                case OK:
-                    throw new Exception("TILT: Should not get here.");
             }
             return "";
         }
@@ -223,29 +221,28 @@ public class Args {
         return message.toString();
     }
 
-    public boolean getBoolean(char arg) {
-        return falseIfNull(booleanArgs.get(arg));
-    }
-
     private boolean falseIfNull(Boolean b) {
         return b == null ? false : b;
-    }
-
-
-    public int getInt(char arg) {
-        return zeroIfNull(intArgs.get(arg));
     }
 
     private int zeroIfNull(Integer i) {
         return i == null ? 0 : i;
     }
 
+    private String blankIfNull(String s) {
+        return s == null ? "" : s;
+    }
+
     public String getString(char arg) {
         return blankIfNull(stringArgs.get(arg));
     }
 
-    private String blankIfNull(String s) {
-        return s == null ? "" : s;
+    public int getInt(char arg) {
+        return zeroIfNull(intArgs.get(arg));
+    }
+
+    public boolean getBoolean(char arg) {
+        return falseIfNull(booleanArgs.get(arg));
     }
 
     public boolean has(char arg) {
