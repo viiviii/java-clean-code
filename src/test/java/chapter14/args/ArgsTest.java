@@ -57,6 +57,27 @@ class ArgsTest {
         assertThat(args.errorMessage()).isEqualTo("Argument(s) -xy unexpected.");
     }
 
+    @DisplayName("Schema가 있고, arugment가 없는 경우")
+    @Test
+    void multipleSchemasButNoArguments() throws Exception {
+        //given
+        String schema = "x,y#,z*";
+        String[] arguments = new String[]{};
+
+        //when
+        Args args = new Args(schema, arguments);
+
+        //then
+        assertThat(args.isValid()).isTrue();
+        assertThat(args.cardinality()).isZero();
+        assertThat(args.has('x')).isFalse();
+        assertThat(args.has('y')).isFalse();
+        assertThat(args.has('z')).isFalse();
+        assertThat(args.getBoolean('x')).isFalse();
+        assertThat(args.getInt('y')).isZero();
+        assertThat(args.getString('z')).isEmpty();
+    }
+
     @DisplayName("schema가 문자가 아닌 경우")
     @Test
     void nonLetterSchema() {
@@ -147,16 +168,13 @@ class ArgsTest {
     @Test
     void simpleBooleanNotPresent() throws Exception {
         //given
-        String schema = "x";
-        String[] arguments = new String[]{};
+        Args args = new Args("x", new String[]{});
 
         //when
-        Args args = new Args(schema, arguments);
+        boolean actual = args.getBoolean('y');
 
         //then
-        assertThat(args.isValid()).isTrue();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.getBoolean('x')).isFalse();
+        assertThat(actual).isFalse();
     }
 
     @DisplayName("String 값이 있는 경우")
@@ -201,17 +219,13 @@ class ArgsTest {
     @Test
     void simpleStringNotPresent() throws Exception {
         //given
-        String schema = "x*";
-        String[] arguments = new String[]{};
+        Args args = new Args("x*", new String[]{});
 
         //when
-        Args args = new Args(schema, arguments);
+        String actual = args.getString('y');
 
         //then
-        assertThat(args.isValid()).isTrue();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.has('x')).isFalse();
-        assertThat(args.getString('x')).isEmpty();
+        assertThat(actual).isEmpty();
     }
 
     @DisplayName("String Argument 값이 없는 경우")
@@ -226,8 +240,6 @@ class ArgsTest {
 
         //then
         assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isOne();
-        assertThat(args.has('x')).isTrue();
         assertThat(args.getString('x')).isEmpty();
         assertThat(args.errorMessage()).isEqualTo("Could not find string parameter for -x.");
     }
@@ -274,17 +286,13 @@ class ArgsTest {
     @Test
     void simpleIntNotPresent() throws Exception {
         //given
-        String schema = "x#";
-        String[] arguments = new String[]{};
+        Args args = new Args("x#", new String[]{});
 
         //when
-        Args args = new Args(schema, arguments);
+        int actual = args.getInt('y');
 
         //then
-        assertThat(args.isValid()).isTrue();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.has('x')).isFalse();
-        assertThat(args.getInt('x')).isZero();
+        assertThat(actual).isZero();
     }
 
     @DisplayName("Integer Argument 값이 없는 경우")
@@ -299,7 +307,6 @@ class ArgsTest {
 
         //then
         assertThat(args.isValid()).isFalse();
-        assertThat(args.has('x')).isFalse();
         assertThat(args.getInt('x')).isZero();
         assertThat(args.errorMessage()).isEqualTo("Could not find integer parameter for -x.");
     }
