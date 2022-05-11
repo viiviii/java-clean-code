@@ -282,13 +282,12 @@ class ArgsTest {
 
         //then
         assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isOne();
-        assertThat(args.has('x')).isTrue();
+        assertThat(args.has('x')).isFalse();
         assertThat(args.getInt('x')).isZero();
         assertThat(args.errorMessage()).isEqualTo("Could not find integer parameter for -x.");
     }
 
-    @DisplayName("integer Argument 값을 파싱할 수 없는 경우")
+    @DisplayName("Integer Argument 값을 파싱할 수 없는 경우")
     @Test
     void invalidInteger() throws Exception {
         //given
@@ -300,8 +299,8 @@ class ArgsTest {
 
         //then
         assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isOne();
-        assertThat(args.has('x')).isTrue();
+        assertThat(args.cardinality()).isZero();
+        assertThat(args.has('x')).isFalse();
         assertThat(args.getInt('x')).isZero();
         assertThat(args.errorMessage()).isEqualTo("Argument -x expects an integer but was 'Forty two'.");
     }

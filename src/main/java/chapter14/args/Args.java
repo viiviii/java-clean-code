@@ -31,7 +31,10 @@ public class Args {
         if (schema.length() == 0 && args.length == 0)
             return true;
         parseSchema();
-        parseArguments();
+        try {
+            parseArguments();
+        } catch (ArgsException e) {
+        }
         return valid;
     }
 
@@ -93,7 +96,7 @@ public class Args {
         return elementTail.equals("#");
     }
 
-    private boolean parseArguments() {
+    private boolean parseArguments() throws ArgsException {
         for (currentArgument = 0; currentArgument < args.length; currentArgument++) {
             String arg = args[currentArgument];
             parseArgument(arg);
@@ -101,18 +104,18 @@ public class Args {
         return true;
     }
 
-    private void parseArgument(String arg) {
+    private void parseArgument(String arg) throws ArgsException {
         if (arg.startsWith("-"))
             parseElements(arg);
     }
 
-    private void parseElements(String arg) {
+    private void parseElements(String arg) throws ArgsException {
         for (int i = 1; i < arg.length(); i++) {
             parseElement(arg.charAt(i));
         }
     }
 
-    private void parseElement(char argChar) {
+    private void parseElement(char argChar) throws ArgsException {
         if (setArgument(argChar))
             argsFound.add(argChar);
         else {
@@ -122,7 +125,7 @@ public class Args {
         }
     }
 
-    private boolean setArgument(char argChar) {
+    private boolean setArgument(char argChar) throws ArgsException {
         if (isBooleanArg(argChar))
             setBooleanArg(argChar, true);
         else if (isStringArg(argChar))
@@ -139,7 +142,7 @@ public class Args {
         return intArgs.containsKey(argChar);
     }
 
-    private void setIntArg(char argChar) {
+    private void setIntArg(char argChar) throws ArgsException {
         currentArgument++;
         String parameter = null;
         try {
@@ -149,11 +152,13 @@ public class Args {
             valid = false;
             errorArgument = argChar;
             errorCode = ErrorCode.MISSING_INTEGER;
+            throw new ArgsException();
         } catch (NumberFormatException e) {
             valid = false;
             errorArgument = argChar;
             errorParameter = parameter;
             errorCode = ErrorCode.INVALID_INTEGER;
+            throw new ArgsException();
         }
     }
 
@@ -251,5 +256,8 @@ public class Args {
 
     public boolean isValid() {
         return valid;
+    }
+
+    private class ArgsException extends Exception {
     }
 }
