@@ -56,6 +56,11 @@ public class Args {
             parseStringSchemaElement(elementId);
         else if (isIntegerSchemaElement(elementTail))
             parseIntegerSchemaElement(elementId);
+        else {
+            throw new ParseException(
+                    String.format("Argument: %c has invalid format: %s.",
+                            elementId, elementTail), 0);
+        }
     }
 
     private void validateSchemaElementId(char elementId) throws ParseException {

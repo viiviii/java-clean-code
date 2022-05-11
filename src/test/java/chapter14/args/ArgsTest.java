@@ -73,6 +73,22 @@ class ArgsTest {
                 .hasMessage("Bad character: * in Args format: *");
     }
 
+    @DisplayName("schema format이 유효하지 않은 경우")
+    @Test
+    void invalidArgumentFormat() {
+        //given
+        String invalidSchemeFormat = "f~";
+        String[] arguments = new String[]{};
+
+        //when
+        Exception exception = catchException(() -> new Args(invalidSchemeFormat, arguments));
+
+        //then
+        assertThat(exception)
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Argument: f has invalid format: ~.");
+    }
+
     @DisplayName("boolean 값이 있는 경우")
     @Test
     void simpleBooleanPresent() throws Exception {
