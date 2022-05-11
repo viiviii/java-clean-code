@@ -13,7 +13,7 @@ public class Args {
     private Map<Character, Integer> intArgs = new HashMap<>();
     private Set<Character> argsFound = new HashSet<>();
     private int currentArgument;
-    private char errorArgument = '\0';
+    private char errorArgumentId = '\0';
     private String errorParameter = "TILT";
     private ErrorCode errorCode = ErrorCode.OK;
 
@@ -150,12 +150,12 @@ public class Args {
             intArgs.put(argChar, new Integer(parameter));
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
-            errorArgument = argChar;
+            errorArgumentId = argChar;
             errorCode = ErrorCode.MISSING_INTEGER;
             throw new ArgsException();
         } catch (NumberFormatException e) {
             valid = false;
-            errorArgument = argChar;
+            errorArgumentId = argChar;
             errorParameter = parameter;
             errorCode = ErrorCode.INVALID_INTEGER;
             throw new ArgsException();
@@ -168,7 +168,7 @@ public class Args {
             stringArgs.put(argChar, args[currentArgument]);
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
-            errorArgument = argChar;
+            errorArgumentId = argChar;
             errorCode = ErrorCode.MISSING_STRING;
         }
     }
@@ -204,13 +204,13 @@ public class Args {
                 return unexpectedArgumentMessage();
             case MISSING_STRING:
                 return String.format("Could not find string parameter for -%c.",
-                        errorArgument);
+                        errorArgumentId);
             case INVALID_INTEGER:
                 return String.format("Argument -%c expects an integer but was '%s'.",
-                        errorArgument, errorParameter);
+                        errorArgumentId, errorParameter);
             case MISSING_INTEGER:
                 return String.format("Could not find integer parameter for -%c.",
-                        errorArgument);
+                        errorArgumentId);
         }
         return "";
 
