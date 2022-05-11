@@ -89,6 +89,23 @@ class ArgsTest {
                 .hasMessage("Argument: f has invalid format: ~.");
     }
 
+    @DisplayName("Schema format에 스페이스가 있는 경우")
+    @Test
+    void spacesInFormat() throws Exception {
+        //given
+        String schema = "x, y";
+        String[] arguments = new String[]{"-xy"};
+
+        //when
+        Args args = new Args(schema, arguments);
+
+        //then
+        assertThat(args.isValid()).isTrue();
+        assertThat(args.cardinality()).isEqualTo(2);
+        assertThat(args.has('x')).isTrue();
+        assertThat(args.has('y')).isTrue();
+    }
+
     @DisplayName("boolean 값이 있는 경우")
     @Test
     void simpleBooleanPresent() throws Exception {
