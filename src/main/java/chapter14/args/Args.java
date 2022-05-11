@@ -9,7 +9,7 @@ public class Args {
     private boolean valid = true;
     private Set<Character> unexpectedArguments = new TreeSet<>();
     private Map<Character, ArgumentMarshaler> booleanArgs = new HashMap<>();
-    private Map<Character, String> stringArgs = new HashMap<>();
+    private Map<Character, ArgumentMarshaler> stringArgs = new HashMap<>();
     private Map<Character, Integer> intArgs = new HashMap<>();
     private Set<Character> argsFound = new HashSet<>();
     private int currentArgument;
@@ -81,7 +81,7 @@ public class Args {
     }
 
     private void parseStringSchemaElement(char elementId) {
-        stringArgs.put(elementId, "");
+        stringArgs.put(elementId, new StringArgumentMarshaler());
     }
 
     private boolean isStringSchemaElement(String elementTail) {
@@ -165,7 +165,7 @@ public class Args {
     private void setStringArg(char argChar) {
         currentArgument++;
         try {
-            stringArgs.put(argChar, args[currentArgument]);
+            stringArgs.get(argChar).setString(args[currentArgument]);
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
             errorArgumentId = argChar;
@@ -230,12 +230,9 @@ public class Args {
         return i == null ? 0 : i;
     }
 
-    private String blankIfNull(String s) {
-        return s == null ? "" : s;
-    }
-
     public String getString(char arg) {
-        return blankIfNull(stringArgs.get(arg));
+        ArgumentMarshaler am = stringArgs.get(arg);
+        return am == null ? "" : am.getString();
     }
 
     public int getInt(char arg) {
@@ -260,6 +257,7 @@ public class Args {
 
     private class ArgumentMarshaler {
         private boolean booleanValue = false;
+        private String stringValue;
 
         public void setBoolean(boolean value) {
             this.booleanValue = value;
@@ -267,6 +265,14 @@ public class Args {
 
         public boolean getBoolean() {
             return booleanValue;
+        }
+
+        public void setString(String value) {
+            stringValue = value;
+        }
+
+        public String getString() {
+            return stringValue == null ? "" : stringValue;
         }
     }
 
