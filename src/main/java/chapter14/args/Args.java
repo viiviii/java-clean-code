@@ -18,7 +18,7 @@ public class Args {
     private ErrorCode errorCode = ErrorCode.OK;
 
     enum ErrorCode {
-        OK, MISSING_STRING, MISSING_INTEGER, INVALID_INTEGER
+        OK, MISSING_STRING, MISSING_INTEGER, INVALID_INTEGER, UNEXPECTED_ARGUMENT
     }
 
     public Args(String schema, String[] args) throws ParseException {
@@ -117,6 +117,7 @@ public class Args {
             argsFound.add(argChar);
         else {
             unexpectedArguments.add(argChar);
+            errorCode = ErrorCode.UNEXPECTED_ARGUMENT;
             valid = false;
         }
     }
@@ -191,24 +192,23 @@ public class Args {
     }
 
     public String errorMessage() throws Exception {
-        if (unexpectedArguments.size() > 0) {
-            return unexpectedArgumentMessage();
-        } else {
-            switch (errorCode) {
-                case OK:
-                    throw new Exception("TILT: Should not get here.");
-                case MISSING_STRING:
-                    return String.format("Could not find string parameter for -%c.",
-                            errorArgument);
-                case INVALID_INTEGER:
-                    return String.format("Argument -%c expects an integer but was '%s'.",
-                            errorArgument, errorParameter);
-                case MISSING_INTEGER:
-                    return String.format("Could not find integer parameter for -%c.",
-                            errorArgument);
-            }
-            return "";
+        switch (errorCode) {
+            case OK:
+                throw new Exception("TILT: Should not get here.");
+            case UNEXPECTED_ARGUMENT:
+                return unexpectedArgumentMessage();
+            case MISSING_STRING:
+                return String.format("Could not find string parameter for -%c.",
+                        errorArgument);
+            case INVALID_INTEGER:
+                return String.format("Argument -%c expects an integer but was '%s'.",
+                        errorArgument, errorParameter);
+            case MISSING_INTEGER:
+                return String.format("Could not find integer parameter for -%c.",
+                        errorArgument);
         }
+        return "";
+
     }
 
     private String unexpectedArgumentMessage() {
