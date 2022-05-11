@@ -57,6 +57,22 @@ class ArgsTest {
         assertThat(args.errorMessage()).isEqualTo("Argument(s) -xy unexpected.");
     }
 
+    @DisplayName("schema가 문자가 아닌 경우")
+    @Test
+    void nonLetterSchema() {
+        //given
+        String nonLetterSchemaElementId = "*";
+        String[] arguments = new String[]{};
+
+        //when
+        Exception exception = catchException(() -> new Args(nonLetterSchemaElementId, arguments));
+
+        //then
+        assertThat(exception)
+                .isInstanceOf(ParseException.class)
+                .hasMessage("Bad character: * in Args format: *");
+    }
+
     @DisplayName("boolean 값이 있는 경우")
     @Test
     void simpleBooleanPresent() throws Exception {
@@ -272,22 +288,6 @@ class ArgsTest {
         assertThat(args.has('x')).isTrue();
         assertThat(args.getInt('x')).isZero();
         assertThat(args.errorMessage()).isEqualTo("Argument -x expects an integer but was 'Forty two'.");
-    }
-
-    @DisplayName("Schema의 ElementId가 문자가 아니면 ParseException이 발생한다")
-    @Test
-    void throwParseExceptionWhenInvalidSchemaElementId() {
-        //given
-        String containsNonLetterElementId = "l,d*,#";
-        String[] arguments = new String[0];
-
-        //when
-        Exception exception = catchException(() -> new Args(containsNonLetterElementId, arguments));
-
-        //then
-        assertThat(exception)
-                .isInstanceOf(ParseException.class)
-                .hasMessage("Bad character: # in Args format: l,d*,#");
     }
 
     @DisplayName("유효한 args에서 errorMessage를 조회할 경우 Excpetion이 발생한다")
