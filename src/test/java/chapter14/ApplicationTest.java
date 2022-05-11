@@ -31,15 +31,27 @@ class ApplicationTest extends MainMethodTest {
     }
 
     @Test
-    void allArgumentsPresent() {
+    void integerArguments() {
         //given
-        String[] args = new String[]{"-l", "-d", "user"};
+        String[] args = new String[]{"-p", "42"};
 
         //when
         runMain(args);
 
         //then
-        assertThat(output()).isEqualTo("logging: true, directory: user");
+        assertThat(output()).contains("42");
+    }
+
+    @Test
+    void allArgumentsPresent() {
+        //given
+        String[] args = new String[]{"-l", "-p", "8080", "-d", "user"};
+
+        //when
+        runMain(args);
+
+        //then
+        assertThat(output()).isEqualTo("logging: true, port: 8080, directory: user");
     }
 
     @Test
@@ -51,7 +63,7 @@ class ApplicationTest extends MainMethodTest {
         runMain(args);
 
         //then
-        assertThat(output()).isEqualTo("logging: false, directory:");
+        assertThat(output()).isEqualTo("logging: false, port: 0, directory:");
     }
 
     @Override
