@@ -107,6 +107,7 @@ public class Args {
         } catch (ArgsException e) {
             valid = false;
             errorArgumentId = argChar;
+            e.setErrorArgumentId(argChar);
             throw e;
         }
     }
@@ -204,6 +205,10 @@ public class Args {
     }
 
     public static class ArgsException extends Exception {
+        private Set<Character> unexpectedArguments = new TreeSet<>();
+        private char errorArgumentId = '\0';
+        private String errorParameter = "TILT";
+        private ArgsException.ErrorCode errorCode = ArgsException.ErrorCode.OK;
 
         public ArgsException() {
         }
@@ -212,8 +217,52 @@ public class Args {
             super(message);
         }
 
-        public String errorMessage() {
-            return super.getMessage();
+        public ArgsException(ErrorCode errorCode) {
+            this.errorCode = errorCode;
+        }
+
+        public ArgsException(ErrorCode errorCode, String errorParameter) {
+            this.errorCode = errorCode;
+            this.errorParameter = errorParameter;
+        }
+
+        public void setErrorArgumentId(char errorArgumentId) {
+            this.errorArgumentId = errorArgumentId;
+        }
+
+        public String errorMessage() throws Exception {
+            switch (errorCode) {
+                case OK:
+                    throw new Exception("TILT: Should not get here.");
+                case UNEXPECTED_ARGUMENT:
+                    return unexpectedArgumentMessage();
+                case MISSING_STRING:
+                    return String.format("Could not find string parameter for -%c.",
+                            errorArgumentId);
+                case INVALID_INTEGER:
+                    return String.format("Argument -%c expects an integer but was '%s'.",
+                            errorArgumentId, errorParameter);
+                case MISSING_INTEGER:
+                    return String.format("Could not find integer parameter for -%c.",
+                            errorArgumentId);
+                case INVALID_DOUBLE:
+                    return String.format("Argument -%c expects an double but was '%s'.",
+                            errorArgumentId, errorParameter);
+                case MISSING_DOUBLE:
+                    return String.format("Could not find double parameter for -%c.",
+                            errorArgumentId);
+            }
+            return "";
+        }
+
+        private String unexpectedArgumentMessage() {
+            StringBuffer message = new StringBuffer("Argument(s) -");
+            for (char c : unexpectedArguments) {
+                message.append(c);
+            }
+            message.append(" unexpected.");
+
+            return message.toString();
         }
 
         public enum ErrorCode {
@@ -251,7 +300,7 @@ public class Args {
                 stringValue = currentArgument.next();
             } catch (NoSuchElementException e) {
                 errorCode = ArgsException.ErrorCode.MISSING_STRING;
-                throw new ArgsException();
+                throw new ArgsException(ArgsException.ErrorCode.MISSING_STRING);
             }
         }
 
@@ -272,11 +321,11 @@ public class Args {
                 intValue = Integer.parseInt(parameter);
             } catch (NoSuchElementException e) {
                 errorCode = ArgsException.ErrorCode.MISSING_INTEGER;
-                throw new ArgsException();
+                throw new ArgsException(ArgsException.ErrorCode.MISSING_INTEGER);
             } catch (NumberFormatException e) {
                 errorParameter = parameter;
                 errorCode = ArgsException.ErrorCode.INVALID_INTEGER;
-                throw new ArgsException();
+                throw new ArgsException(ArgsException.ErrorCode.INVALID_INTEGER, parameter);
             }
         }
 
@@ -297,11 +346,11 @@ public class Args {
                 doubleValue = Double.parseDouble(parameter);
             } catch (NoSuchElementException e) {
                 errorCode = ArgsException.ErrorCode.MISSING_DOUBLE;
-                throw new ArgsException();
+                throw new ArgsException(ArgsException.ErrorCode.MISSING_DOUBLE, parameter);
             } catch (NumberFormatException e) {
                 errorParameter = parameter;
                 errorCode = ArgsException.ErrorCode.INVALID_DOUBLE;
-                throw new ArgsException();
+                throw new ArgsException(ArgsException.ErrorCode.INVALID_DOUBLE, parameter);
             }
         }
 
