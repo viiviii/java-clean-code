@@ -50,13 +50,13 @@ public class Args {
         char elementId = element.charAt(0);
         String elementTail = element.substring(1);
         validateSchemaElementId(elementId);
-        if (isBooleanSchemaElement(elementTail))
-            parseBooleanSchemaElement(elementId);
-        else if (isStringSchemaElement(elementTail))
-            parseStringSchemaElement(elementId);
-        else if (isIntegerSchemaElement(elementTail))
-            parseIntegerSchemaElement(elementId);
-        else {
+        if (isBooleanSchemaElement(elementTail)) {
+            marshalers.put(elementId, new BooleanArgumentMarshaler());
+        } else if (isStringSchemaElement(elementTail)) {
+            marshalers.put(elementId, new StringArgumentMarshaler());
+        } else if (isIntegerSchemaElement(elementTail)) {
+            marshalers.put(elementId, new IntegerArgumentMarshaler());
+        } else {
             throw new ParseException(
                     String.format("Argument: %c has invalid format: %s.",
                             elementId, elementTail), 0);
@@ -68,21 +68,6 @@ public class Args {
             throw new ParseException(
                     "Bad character: " + elementId + " in Args format: " + schema, 0);
         }
-    }
-
-    private void parseBooleanSchemaElement(char elementId) {
-        ArgumentMarshaler m = new BooleanArgumentMarshaler();
-        marshalers.put(elementId, m);
-    }
-
-    private void parseIntegerSchemaElement(char elementId) {
-        ArgumentMarshaler m = new IntegerArgumentMarshaler();
-        marshalers.put(elementId, m);
-    }
-
-    private void parseStringSchemaElement(char elementId) {
-        ArgumentMarshaler m = new StringArgumentMarshaler();
-        marshalers.put(elementId, m);
     }
 
     private boolean isStringSchemaElement(String elementTail) {
