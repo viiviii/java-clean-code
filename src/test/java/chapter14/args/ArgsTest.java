@@ -234,12 +234,15 @@ class ArgsTest {
         String[] arguments = new String[]{"-x"}; // missing
 
         //when
-        Args args = new Args(schema, arguments);
+        Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.getString('x')).isEmpty();
-        assertThat(args.errorMessage()).isEqualTo("Could not find string parameter for -x.");
+        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+
+        Args.ArgsException e = (Args.ArgsException) exception;
+        assertThat(e.errorMessage()).isEqualTo("Could not find string parameter for -x.");
+        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.MISSING_STRING);
+        assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
     @DisplayName("int 값이 있는 경우")
@@ -301,12 +304,15 @@ class ArgsTest {
         String[] arguments = new String[]{"-x"}; // missing
 
         //when
-        Args args = new Args(schema, arguments);
+        Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.getInt('x')).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Could not find integer parameter for -x.");
+        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+
+        Args.ArgsException e = (Args.ArgsException) exception;
+        assertThat(e.errorMessage()).isEqualTo("Could not find integer parameter for -x.");
+        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.MISSING_INTEGER);
+        assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
     @DisplayName("Integer Argument 값을 파싱할 수 없는 경우")
@@ -317,14 +323,16 @@ class ArgsTest {
         String[] arguments = new String[]{"-x", "Forty two"};
 
         //when
-        Args args = new Args(schema, arguments);
+        Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.has('x')).isFalse();
-        assertThat(args.getInt('x')).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Argument -x expects an integer but was 'Forty two'.");
+        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+
+        Args.ArgsException e = (Args.ArgsException) exception;
+        assertThat(e.errorMessage()).isEqualTo("Argument -x expects an integer but was 'Forty two'.");
+        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.INVALID_INTEGER);
+        assertThat(e.getErrorArgumentId()).isEqualTo('x');
+        assertThat(e.getErrorParameter()).isEqualTo("Forty two");
     }
 
     @DisplayName("double 값이 있는 경우")
@@ -365,14 +373,15 @@ class ArgsTest {
         String[] arguments = new String[]{"-x"}; // missing
 
         //when
-        Args args = new Args(schema, arguments);
+        Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.has('x')).isFalse();
-        assertThat(args.getDouble('x')).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Could not find double parameter for -x.");
+        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+
+        Args.ArgsException e = (Args.ArgsException) exception;
+        assertThat(e.errorMessage()).isEqualTo("Could not find double parameter for -x.");
+        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.MISSING_DOUBLE);
+        assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
     @DisplayName("Double Argument 값을 파싱할 수 없는 경우")
@@ -383,14 +392,16 @@ class ArgsTest {
         String[] arguments = new String[]{"-x", "Forty two"};
 
         //when
-        Args args = new Args(schema, arguments);
+        Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.has('x')).isFalse();
-        assertThat(args.getDouble('x')).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Argument -x expects an double but was 'Forty two'.");
+        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+
+        Args.ArgsException e = (Args.ArgsException) exception;
+        assertThat(e.errorMessage()).isEqualTo("Argument -x expects an double but was 'Forty two'.");
+        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.INVALID_DOUBLE);
+        assertThat(e.getErrorArgumentId()).isEqualTo('x');
+        assertThat(e.getErrorParameter()).isEqualTo("Forty two");
     }
 
     @DisplayName("잘못된 타입으로 호출한 경우")
