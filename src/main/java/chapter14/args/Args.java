@@ -2,12 +2,17 @@ package chapter14.args;
 
 import java.util.*;
 
+import static chapter14.args.ArgsException.ErrorCode.*;
+
 public class Args {
-    private Map<Character, ArgumentMarshaler> marshalers = new HashMap<>();
-    private Set<Character> argsFound = new HashSet<>();
+    private Map<Character, ArgumentMarshaler> marshalers;
+    private Set<Character> argsFound;
     private ListIterator<String> currentArgument;
 
     public Args(String schema, String[] args) throws ArgsException {
+        marshalers = new HashMap<>();
+        argsFound = new HashSet<>();
+
         parseSchema(schema);
         parseArgumentStrings(Arrays.asList(args));
     }
@@ -24,24 +29,22 @@ public class Args {
         char elementId = element.charAt(0);
         String elementTail = element.substring(1);
         validateSchemaElementId(elementId);
-        if (elementTail.length() == 0) {
+        if (elementTail.length() == 0)
             marshalers.put(elementId, new BooleanArgumentMarshaler());
-        } else if (elementTail.equals("*")) {
+        else if (elementTail.equals("*"))
             marshalers.put(elementId, new StringArgumentMarshaler());
-        } else if (elementTail.equals("#")) {
+        else if (elementTail.equals("#"))
             marshalers.put(elementId, new IntegerArgumentMarshaler());
-        } else if (elementTail.equals("##")) {
+        else if (elementTail.equals("##"))
             marshalers.put(elementId, new DoubleArgumentMarshaler());
-        } else {
-            throw new ArgsException(ArgsException.ErrorCode.INVALID_ARGUMENT_FORMAT,
-                    elementId, elementTail);
-        }
+        else
+            throw new ArgsException(INVALID_ARGUMENT_FORMAT, elementId, elementTail);
+
     }
 
     private void validateSchemaElementId(char elementId) throws ArgsException {
         if (!Character.isLetter(elementId)) {
-            throw new ArgsException(ArgsException.ErrorCode.INVALID_ARGUMENT_NAME,
-                    elementId, null);
+            throw new ArgsException(INVALID_ARGUMENT_NAME, elementId, null);
         }
     }
 
@@ -66,7 +69,7 @@ public class Args {
     private void parseArgumentCharacter(char argChar) throws ArgsException {
         ArgumentMarshaler m = marshalers.get(argChar);
         if (m == null) {
-            throw new ArgsException(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT, argChar, null);
+            throw new ArgsException(UNEXPECTED_ARGUMENT, argChar, null);
         } else {
             argsFound.add(argChar);
             try {
@@ -78,31 +81,27 @@ public class Args {
         }
     }
 
-    public boolean getBoolean(char arg) {
-        ArgumentMarshaler am = marshalers.get(arg);
-        return BooleanArgumentMarshaler.getValue(am);
-    }
-
-    public String getString(char arg) {
-        ArgumentMarshaler am = marshalers.get(arg);
-        return StringArgumentMarshaler.getValue(am);
-    }
-
-    public int getInt(char arg) {
-        ArgumentMarshaler am = marshalers.get(arg);
-        return IntegerArgumentMarshaler.getValue(am);
-    }
-
-    public double getDouble(char arg) {
-        ArgumentMarshaler am = marshalers.get(arg);
-        return DoubleArgumentMarshaler.getValue(am);
-    }
-
     public boolean has(char arg) {
         return argsFound.contains(arg);
     }
 
     public int nextArgument() {
         return currentArgument.nextIndex();
+    }
+
+    public boolean getBoolean(char arg) {
+        return BooleanArgumentMarshaler.getValue(marshalers.get(arg));
+    }
+
+    public String getString(char arg) {
+        return StringArgumentMarshaler.getValue(marshalers.get(arg));
+    }
+
+    public int getInt(char arg) {
+        return IntegerArgumentMarshaler.getValue(marshalers.get(arg));
+    }
+
+    public double getDouble(char arg) {
+        return DoubleArgumentMarshaler.getValue(marshalers.get(arg));
     }
 }
