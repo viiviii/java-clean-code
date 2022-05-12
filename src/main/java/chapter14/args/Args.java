@@ -8,7 +8,6 @@ public class Args {
     private String[] args;
     private boolean valid = true;
     private Set<Character> unexpectedArguments = new TreeSet<>();
-    private Map<Character, ArgumentMarshaler> booleanArgs = new HashMap<>();
     private Map<Character, ArgumentMarshaler> stringArgs = new HashMap<>();
     private Map<Character, ArgumentMarshaler> intArgs = new HashMap<>();
     private Map<Character, ArgumentMarshaler> marshalers = new HashMap<>();
@@ -75,7 +74,6 @@ public class Args {
 
     private void parseBooleanSchemaElement(char elementId) {
         ArgumentMarshaler m = new BooleanArgumentMarshaler();
-        booleanArgs.put(elementId, m);
         marshalers.put(elementId, m);
     }
 
@@ -236,8 +234,14 @@ public class Args {
     }
 
     public boolean getBoolean(char arg) {
-        ArgumentMarshaler am = booleanArgs.get(arg);
-        return am != null && (Boolean) am.get();
+        ArgumentMarshaler am = marshalers.get(arg);
+        boolean b = false;
+        try {
+            b = am != null && (Boolean) am.get();
+        } catch (ClassCastException e) {
+            b = false;
+        }
+        return b;
     }
 
     public boolean has(char arg) {
