@@ -43,16 +43,15 @@ public class Args {
         } else if (elementTail.equals("##")) {
             marshalers.put(elementId, new DoubleArgumentMarshaler());
         } else {
-            throw new ArgsException(
-                    String.format("Argument: %c has invalid format: %s.",
-                            elementId, elementTail));
+            throw new ArgsException(ArgsException.ErrorCode.INVALID_ARGUMENT_FORMAT,
+                    elementId, elementTail);
         }
     }
 
     private void validateSchemaElementId(char elementId) throws ArgsException {
         if (!Character.isLetter(elementId)) {
-            throw new ArgsException(
-                    "Bad character: " + elementId + " in Args format: " + schema);
+            throw new ArgsException(ArgsException.ErrorCode.INVALID_ARGUMENT_NAME,
+                    elementId, null);
         }
     }
 

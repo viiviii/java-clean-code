@@ -3,6 +3,7 @@ package chapter14.args;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static chapter14.args.ArgsException.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 
@@ -36,7 +37,7 @@ class ArgsTest {
         assertThat(exception).isInstanceOf(ArgsException.class);
 
         ArgsException e = (ArgsException) exception;
-        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT);
+        assertThat(e.getErrorCode()).isEqualTo(UNEXPECTED_ARGUMENT);
         assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
@@ -71,9 +72,11 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(nonLetterSchemaElementId, arguments));
 
         //then
-        assertThat(exception)
-                .isInstanceOf(ArgsException.class)
-                .hasMessage("Bad character: * in Args format: *");
+        assertThat(exception).isInstanceOf(ArgsException.class);
+
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(INVALID_ARGUMENT_NAME);
+        assertThat(e.getErrorArgumentId()).isEqualTo('*');
     }
 
     @DisplayName("schema format이 유효하지 않은 경우")
@@ -87,9 +90,11 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(invalidSchemeFormat, arguments));
 
         //then
-        assertThat(exception)
-                .isInstanceOf(ArgsException.class)
-                .hasMessage("Argument: f has invalid format: ~.");
+        assertThat(exception).isInstanceOf(ArgsException.class);
+
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(INVALID_ARGUMENT_FORMAT);
+        assertThat(e.getErrorArgumentId()).isEqualTo('f');
     }
 
     @DisplayName("Schema format에 스페이스가 있는 경우")

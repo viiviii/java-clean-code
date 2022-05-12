@@ -2,6 +2,8 @@ package chapter14.args;
 
 import org.junit.jupiter.api.Test;
 
+import static chapter14.args.ArgsException.ErrorCode;
+import static chapter14.args.ArgsException.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ArgsExceptionTest {
@@ -9,7 +11,7 @@ class ArgsExceptionTest {
     @Test
     void unexpectedMessage() throws Exception {
         //given
-        ArgsException.ErrorCode errorCode = ArgsException.ErrorCode.UNEXPECTED_ARGUMENT;
+        ErrorCode errorCode = UNEXPECTED_ARGUMENT;
 
         //when
         ArgsException e = new ArgsException(errorCode, 'x', null);
@@ -21,7 +23,7 @@ class ArgsExceptionTest {
     @Test
     void missingStringMessage() throws Exception {
         //given
-        ArgsException.ErrorCode errorCode = ArgsException.ErrorCode.MISSING_STRING;
+        ErrorCode errorCode = MISSING_STRING;
 
         //when
         ArgsException e = new ArgsException(errorCode, 'x', null);
@@ -33,7 +35,7 @@ class ArgsExceptionTest {
     @Test
     void invalidIntegerMessage() throws Exception {
         //given
-        ArgsException.ErrorCode errorCode = ArgsException.ErrorCode.INVALID_INTEGER;
+        ErrorCode errorCode = INVALID_INTEGER;
 
         //when
         ArgsException e = new ArgsException(errorCode, 'x', "Forty two");
@@ -45,7 +47,7 @@ class ArgsExceptionTest {
     @Test
     void missingIntegerMessage() throws Exception {
         //given
-        ArgsException.ErrorCode errorCode = ArgsException.ErrorCode.MISSING_INTEGER;
+        ErrorCode errorCode = MISSING_INTEGER;
 
         //when
         ArgsException e = new ArgsException(errorCode, 'x', null);
@@ -57,7 +59,7 @@ class ArgsExceptionTest {
     @Test
     void invalidDoubleMessage() throws Exception {
         //given
-        ArgsException.ErrorCode errorCode = ArgsException.ErrorCode.INVALID_DOUBLE;
+        ErrorCode errorCode = INVALID_DOUBLE;
 
         //when
         ArgsException e = new ArgsException(errorCode, 'x', "Forty two");
@@ -69,12 +71,36 @@ class ArgsExceptionTest {
     @Test
     void missingDoubleMessage() throws Exception {
         //given
-        ArgsException.ErrorCode errorCode = ArgsException.ErrorCode.MISSING_DOUBLE;
+        ErrorCode errorCode = MISSING_DOUBLE;
 
         //when
         ArgsException e = new ArgsException(errorCode, 'x', null);
 
         //then
         assertThat(e.errorMessage()).isEqualTo("Could not find double parameter for -x.");
+    }
+
+    @Test
+    void invalidArgumentNameMessage() throws Exception {
+        //given
+        ErrorCode errorCode = INVALID_ARGUMENT_NAME;
+
+        //when
+        ArgsException e = new ArgsException(errorCode, 'x', null);
+
+        //then
+        assertThat(e.errorMessage()).isEqualTo("'x' is not a valid argument name.");
+    }
+
+    @Test
+    void invalidArgumentFormatMessage() throws Exception {
+        //given
+        ErrorCode errorCode = INVALID_ARGUMENT_FORMAT;
+
+        //when
+        ArgsException e = new ArgsException(errorCode, 'x', "f~");
+
+        //then
+        assertThat(e.errorMessage()).isEqualTo("'f~' is not a valid argument format.");
     }
 }
