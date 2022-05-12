@@ -51,10 +51,10 @@ public class ArgsException extends Exception {
         this.errorCode = errorCode;
     }
 
-    public String errorMessage() throws Exception {
+    public String errorMessage() {
         switch (errorCode) {
             case OK:
-                throw new Exception("TILT: Should not get here.");
+                return "TILT: Should not get here.";
             case UNEXPECTED_ARGUMENT:
                 return String.format("Argument(s) -%c unexpected.", errorArgumentId);
             case MISSING_STRING:

@@ -22,8 +22,11 @@ public class IntegerArgumentMarshaler implements ArgumentMarshaler {
         }
     }
 
-    @Override
-    public Object get() {
-        return intValue;
+    public static int getValue(ArgumentMarshaler am) {
+        if (am != null && am instanceof IntegerArgumentMarshaler) {
+            return ((IntegerArgumentMarshaler) am).intValue;
+        } else {
+            return 0;
+        }
     }
 }
