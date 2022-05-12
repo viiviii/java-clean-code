@@ -17,15 +17,10 @@ public class StringArgumentMarshaler implements ArgumentMarshaler {
         }
     }
 
-    @Override
-    public Object get() {
-        return stringValue;
-    }
-
     public static String getValue(ArgumentMarshaler am) {
-        try {
-            return am == null ? "" : (String) am.get();
-        } catch (ClassCastException e) {
+        if (am != null && am instanceof StringArgumentMarshaler) {
+            return ((StringArgumentMarshaler) am).stringValue;
+        } else {
             return "";
         }
     }
