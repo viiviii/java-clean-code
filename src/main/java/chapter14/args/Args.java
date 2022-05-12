@@ -3,30 +3,24 @@ package chapter14.args;
 import java.util.*;
 
 public class Args {
-    private String schema;
     private Map<Character, ArgumentMarshaler> marshalers = new HashMap<>();
     private Set<Character> argsFound = new HashSet<>();
     private Iterator<String> currentArgument;
     private List<String> argsList;
 
     public Args(String schema, String[] args) throws ArgsException {
-        this.schema = schema;
         argsList = Arrays.asList(args);
-        parse();
-    }
 
-    private void parse() throws ArgsException {
-        parseSchema();
+        parseSchema(schema);
         parseArguments();
     }
 
-    private boolean parseSchema() throws ArgsException {
+    private void parseSchema(String schema) throws ArgsException {
         for (String element : schema.split(",")) {
             if (element.length() > 0) {
                 parseSchemaElement(element.trim());
             }
         }
-        return true;
     }
 
     private void parseSchemaElement(String element) throws ArgsException {
