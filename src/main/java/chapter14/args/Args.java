@@ -23,8 +23,7 @@ public class Args {
     private boolean parseSchema() throws ArgsException {
         for (String element : schema.split(",")) {
             if (element.length() > 0) {
-                String trimmedElement = element.trim();
-                parseSchemaElement(trimmedElement);
+                parseSchemaElement(element.trim());
             }
         }
         return true;
@@ -77,7 +76,8 @@ public class Args {
         if (setArgument(argChar))
             argsFound.add(argChar);
         else {
-            throw new ArgsException(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT, argChar, null);
+            throw new ArgsException(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT,
+                    argChar, null);
         }
     }
 
@@ -105,6 +105,17 @@ public class Args {
             return "";
     }
 
+    public boolean getBoolean(char arg) {
+        ArgumentMarshaler am = marshalers.get(arg);
+        boolean b = false;
+        try {
+            b = am != null && (Boolean) am.get();
+        } catch (ClassCastException e) {
+            b = false;
+        }
+        return b;
+    }
+
     public String getString(char arg) {
         ArgumentMarshaler am = marshalers.get(arg);
         try {
@@ -121,17 +132,6 @@ public class Args {
         } catch (ClassCastException e) {
             return 0;
         }
-    }
-
-    public boolean getBoolean(char arg) {
-        ArgumentMarshaler am = marshalers.get(arg);
-        boolean b = false;
-        try {
-            b = am != null && (Boolean) am.get();
-        } catch (ClassCastException e) {
-            b = false;
-        }
-        return b;
     }
 
     public double getDouble(char arg) {
