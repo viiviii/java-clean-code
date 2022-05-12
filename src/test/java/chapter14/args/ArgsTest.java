@@ -3,8 +3,7 @@ package chapter14.args;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.text.ParseException;
-
+import static chapter14.args.ArgsException.ErrorCode.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 
@@ -21,40 +20,25 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isZero();
     }
 
     @DisplayName("schema가 없고 argument가 1개 있는 경우")
     @Test
-    void noSchemaButWithOneArgument() throws Exception {
+    void noSchemaButWithOneArgument() {
         //given
         String schema = "";
         String[] arguments = new String[]{"-x"};
 
         //when
-        Args args = new Args(schema, arguments);
+        Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Argument(s) -x unexpected.");
-    }
+        assertThat(exception).isInstanceOf(ArgsException.class);
 
-    @DisplayName("schema가 없고 argument가 여러 개 있는 경우")
-    @Test
-    void noSchemaButWithMultipleArguments() throws Exception {
-        //given
-        String schema = "";
-        String[] arguments = new String[]{"-x", "-y"};
-
-        //when
-        Args args = new Args(schema, arguments);
-
-        //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Argument(s) -xy unexpected.");
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(UNEXPECTED_ARGUMENT);
+        assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
     @DisplayName("Schema가 있고, arugment가 없는 경우")
@@ -68,7 +52,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isZero();
         assertThat(args.has('x')).isFalse();
         assertThat(args.has('y')).isFalse();
@@ -89,9 +72,11 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(nonLetterSchemaElementId, arguments));
 
         //then
-        assertThat(exception)
-                .isInstanceOf(ParseException.class)
-                .hasMessage("Bad character: * in Args format: *");
+        assertThat(exception).isInstanceOf(ArgsException.class);
+
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(INVALID_ARGUMENT_NAME);
+        assertThat(e.getErrorArgumentId()).isEqualTo('*');
     }
 
     @DisplayName("schema format이 유효하지 않은 경우")
@@ -105,9 +90,11 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(invalidSchemeFormat, arguments));
 
         //then
-        assertThat(exception)
-                .isInstanceOf(ParseException.class)
-                .hasMessage("Argument: f has invalid format: ~.");
+        assertThat(exception).isInstanceOf(ArgsException.class);
+
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(INVALID_ARGUMENT_FORMAT);
+        assertThat(e.getErrorArgumentId()).isEqualTo('f');
     }
 
     @DisplayName("Schema format에 스페이스가 있는 경우")
@@ -121,7 +108,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isEqualTo(2);
         assertThat(args.has('x')).isTrue();
         assertThat(args.has('y')).isTrue();
@@ -138,7 +124,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isOne();
         assertThat(args.getBoolean('x')).isTrue();
     }
@@ -154,7 +139,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isEqualTo(2);
         assertThat(args.has('x')).isTrue();
         assertThat(args.has('y')).isTrue();
@@ -188,7 +172,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isOne();
         assertThat(args.has('x')).isTrue();
         assertThat(args.getString('x')).isEqualTo("param");
@@ -205,7 +188,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isEqualTo(2);
         assertThat(args.has('x')).isTrue();
         assertThat(args.has('y')).isTrue();
@@ -228,22 +210,6 @@ class ArgsTest {
         assertThat(actual).isEmpty();
     }
 
-    @DisplayName("String Argument 값이 없는 경우")
-    @Test
-    void missingStringArgument() throws Exception {
-        //given
-        String schema = "x*";
-        String[] arguments = new String[]{"-x"}; // missing
-
-        //when
-        Args args = new Args(schema, arguments);
-
-        //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.getString('x')).isEmpty();
-        assertThat(args.errorMessage()).isEqualTo("Could not find string parameter for -x.");
-    }
-
     @DisplayName("int 값이 있는 경우")
     @Test
     void simpleIntPresent() throws Exception {
@@ -255,7 +221,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isOne();
         assertThat(args.has('x')).isTrue();
         assertThat(args.getInt('x')).isEqualTo(42);
@@ -272,7 +237,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isEqualTo(2);
         assertThat(args.has('x')).isTrue();
         assertThat(args.has('y')).isTrue();
@@ -295,40 +259,6 @@ class ArgsTest {
         assertThat(actual).isZero();
     }
 
-    @DisplayName("Integer Argument 값이 없는 경우")
-    @Test
-    void missingInteger() throws Exception {
-        //given
-        String schema = "x#";
-        String[] arguments = new String[]{"-x"}; // missing
-
-        //when
-        Args args = new Args(schema, arguments);
-
-        //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.getInt('x')).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Could not find integer parameter for -x.");
-    }
-
-    @DisplayName("Integer Argument 값을 파싱할 수 없는 경우")
-    @Test
-    void invalidInteger() throws Exception {
-        //given
-        String schema = "x#";
-        String[] arguments = new String[]{"-x", "Forty two"};
-
-        //when
-        Args args = new Args(schema, arguments);
-
-        //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.has('x')).isFalse();
-        assertThat(args.getInt('x')).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Argument -x expects an integer but was 'Forty two'.");
-    }
-
     @DisplayName("double 값이 있는 경우")
     @Test
     void simpleDoublePresent() throws Exception {
@@ -340,7 +270,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isOne();
         assertThat(args.has('x')).isTrue();
         assertThat(args.getDouble('x')).isEqualTo(42.3);
@@ -359,42 +288,6 @@ class ArgsTest {
         assertThat(actual).isZero();
     }
 
-    @DisplayName("Double Argument 값이 없는 경우")
-    @Test
-    void missingDouble() throws Exception {
-        //given
-        String schema = "x##";
-        String[] arguments = new String[]{"-x"}; // missing
-
-        //when
-        Args args = new Args(schema, arguments);
-
-        //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.has('x')).isFalse();
-        assertThat(args.getDouble('x')).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Could not find double parameter for -x.");
-    }
-
-    @DisplayName("Double Argument 값을 파싱할 수 없는 경우")
-    @Test
-    void invalidDouble() throws Exception {
-        //given
-        String schema = "x##";
-        String[] arguments = new String[]{"-x", "Forty two"};
-
-        //when
-        Args args = new Args(schema, arguments);
-
-        //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.has('x')).isFalse();
-        assertThat(args.getDouble('x')).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Argument -x expects an double but was 'Forty two'.");
-    }
-
     @DisplayName("잘못된 타입으로 호출한 경우")
     @Test
     void invalidType() throws Exception {
@@ -410,21 +303,5 @@ class ArgsTest {
         assertThat(args.getString('x')).isEmpty(); // x is type int
         assertThat(args.getInt('y')).isZero(); // y is type String
         assertThat(args.getDouble('y')).isZero(); // y is type String
-    }
-
-    @DisplayName("유효한 args에서 errorMessage를 조회할 경우 Excpetion이 발생한다")
-    @Test
-    void errorMessageThrowExceptionWhenErrorCodeIsOK() throws Exception {
-        //given
-        Args args = new Args("x", new String[]{"-x"});
-        assertThat(args.isValid()).isTrue();
-
-        //when
-        Exception exception = catchException(args::errorMessage);
-
-        //then
-        assertThat(exception)
-                .isInstanceOf(Exception.class)
-                .hasMessage("TILT: Should not get here.");
     }
 }

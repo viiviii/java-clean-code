@@ -1,8 +1,7 @@
 package chapter14;
 
 import chapter14.args.Args;
-
-import java.text.ParseException;
+import chapter14.args.ArgsException;
 
 class Application {
 
@@ -13,8 +12,8 @@ class Application {
             int port = arg.getInt('p');
             String directory = arg.getString('d');
             executeApplication(logging, port, directory);
-        } catch (ParseException e) {
-            System.out.printf("Parse error: %s\n", e.getMessage());
+        } catch (ArgsException e) {
+            System.out.printf("Argument error: %s\n", e.getMessage());
         }
     }
 
