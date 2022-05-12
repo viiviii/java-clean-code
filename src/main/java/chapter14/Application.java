@@ -1,6 +1,7 @@
 package chapter14;
 
 import chapter14.args.Args;
+import chapter14.args.ArgsException;
 
 class Application {
 
@@ -11,7 +12,7 @@ class Application {
             int port = arg.getInt('p');
             String directory = arg.getString('d');
             executeApplication(logging, port, directory);
-        } catch (Args.ArgsException e) {
+        } catch (ArgsException e) {
             System.out.printf("Argument error: %s\n", e.getMessage());
         }
     }

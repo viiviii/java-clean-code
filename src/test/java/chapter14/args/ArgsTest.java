@@ -34,11 +34,10 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+        assertThat(exception).isInstanceOf(ArgsException.class);
 
-        Args.ArgsException e = (Args.ArgsException) exception;
-        assertThat(e.errorMessage()).isEqualTo("Argument(s) -x unexpected.");
-        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.UNEXPECTED_ARGUMENT);
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT);
         assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
@@ -75,7 +74,7 @@ class ArgsTest {
 
         //then
         assertThat(exception)
-                .isInstanceOf(Args.ArgsException.class)
+                .isInstanceOf(ArgsException.class)
                 .hasMessage("Bad character: * in Args format: *");
     }
 
@@ -91,7 +90,7 @@ class ArgsTest {
 
         //then
         assertThat(exception)
-                .isInstanceOf(Args.ArgsException.class)
+                .isInstanceOf(ArgsException.class)
                 .hasMessage("Argument: f has invalid format: ~.");
     }
 
@@ -224,11 +223,10 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+        assertThat(exception).isInstanceOf(ArgsException.class);
 
-        Args.ArgsException e = (Args.ArgsException) exception;
-        assertThat(e.errorMessage()).isEqualTo("Could not find string parameter for -x.");
-        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.MISSING_STRING);
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.MISSING_STRING);
         assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
@@ -294,11 +292,10 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+        assertThat(exception).isInstanceOf(ArgsException.class);
 
-        Args.ArgsException e = (Args.ArgsException) exception;
-        assertThat(e.errorMessage()).isEqualTo("Could not find integer parameter for -x.");
-        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.MISSING_INTEGER);
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.MISSING_INTEGER);
         assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
@@ -313,11 +310,10 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+        assertThat(exception).isInstanceOf(ArgsException.class);
 
-        Args.ArgsException e = (Args.ArgsException) exception;
-        assertThat(e.errorMessage()).isEqualTo("Argument -x expects an integer but was 'Forty two'.");
-        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.INVALID_INTEGER);
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.INVALID_INTEGER);
         assertThat(e.getErrorArgumentId()).isEqualTo('x');
         assertThat(e.getErrorParameter()).isEqualTo("Forty two");
     }
@@ -363,11 +359,10 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+        assertThat(exception).isInstanceOf(ArgsException.class);
 
-        Args.ArgsException e = (Args.ArgsException) exception;
-        assertThat(e.errorMessage()).isEqualTo("Could not find double parameter for -x.");
-        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.MISSING_DOUBLE);
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.MISSING_DOUBLE);
         assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
@@ -382,11 +377,10 @@ class ArgsTest {
         Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(exception).isInstanceOf(Args.ArgsException.class);
+        assertThat(exception).isInstanceOf(ArgsException.class);
 
-        Args.ArgsException e = (Args.ArgsException) exception;
-        assertThat(e.errorMessage()).isEqualTo("Argument -x expects an double but was 'Forty two'.");
-        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.INVALID_DOUBLE);
+        ArgsException e = (ArgsException) exception;
+        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.INVALID_DOUBLE);
         assertThat(e.getErrorArgumentId()).isEqualTo('x');
         assertThat(e.getErrorParameter()).isEqualTo("Forty two");
     }
@@ -406,21 +400,5 @@ class ArgsTest {
         assertThat(args.getString('x')).isEmpty(); // x is type int
         assertThat(args.getInt('y')).isZero(); // y is type String
         assertThat(args.getDouble('y')).isZero(); // y is type String
-    }
-
-    @DisplayName("유효한 args에서 errorMessage를 조회할 경우 Excpetion이 발생한다")
-    @Test
-    void errorMessageThrowExceptionWhenErrorCodeIsOK() throws Exception {
-        //given
-        Args args = new Args("x", new String[]{"-x"});
-        assertThat(args.isValid()).isTrue();
-
-        //when
-        Exception exception = catchException(args::errorMessage);
-
-        //then
-        assertThat(exception)
-                .isInstanceOf(Exception.class)
-                .hasMessage("TILT: Should not get here.");
     }
 }
