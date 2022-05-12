@@ -206,15 +206,13 @@ public class Args {
     private class ArgsException extends Exception {
     }
 
-    private abstract class ArgumentMarshaler {
-        public abstract void set(String s) throws ArgsException;
+    private interface ArgumentMarshaler {
+        void set(Iterator<String> currentArgument) throws ArgsException;
 
-        public abstract void set(Iterator<String> currentArgument) throws ArgsException;
-
-        public abstract Object get();
+        Object get();
     }
 
-    private class BooleanArgumentMarshaler extends ArgumentMarshaler {
+    private class BooleanArgumentMarshaler implements ArgumentMarshaler {
         private boolean booleanValue = false;
 
         @Override
@@ -223,16 +221,12 @@ public class Args {
         }
 
         @Override
-        public void set(String s) {
-        }
-
-        @Override
         public Object get() {
             return booleanValue;
         }
     }
 
-    private class StringArgumentMarshaler extends ArgumentMarshaler {
+    private class StringArgumentMarshaler implements ArgumentMarshaler {
         private String stringValue = "";
 
         @Override
@@ -246,16 +240,12 @@ public class Args {
         }
 
         @Override
-        public void set(String s) {
-        }
-
-        @Override
         public Object get() {
             return stringValue;
         }
     }
 
-    private class IntegerArgumentMarshaler extends ArgumentMarshaler {
+    private class IntegerArgumentMarshaler implements ArgumentMarshaler {
         private int intValue = 0;
 
         @Override
@@ -272,10 +262,6 @@ public class Args {
                 errorCode = ErrorCode.INVALID_INTEGER;
                 throw new ArgsException();
             }
-        }
-
-        @Override
-        public void set(String s) throws ArgsException {
         }
 
         @Override
