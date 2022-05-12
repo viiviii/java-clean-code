@@ -329,6 +329,22 @@ class ArgsTest {
         assertThat(args.errorMessage()).isEqualTo("Argument -x expects an integer but was 'Forty two'.");
     }
 
+    @DisplayName("잘못된 타입으로 호출한 경우")
+    @Test
+    void invalidType() throws Exception {
+        //given
+        String schema = "x#,y*";
+        String[] arguments = new String[]{"-x", "42", "-y", "param"};
+
+        //when
+        Args args = new Args(schema, arguments);
+
+        //then
+        assertThat(args.getBoolean('x')).isFalse(); // x is type int
+        assertThat(args.getString('x')).isEmpty(); // x is type int
+        assertThat(args.getInt('y')).isZero(); // y is type String
+    }
+
     @DisplayName("유효한 args에서 errorMessage를 조회할 경우 Excpetion이 발생한다")
     @Test
     void errorMessageThrowExceptionWhenErrorCodeIsOK() throws Exception {
