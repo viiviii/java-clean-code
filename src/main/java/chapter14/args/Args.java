@@ -91,6 +91,7 @@ public class Args {
             unexpectedArguments.add(argChar);
             errorCode = ArgsException.ErrorCode.UNEXPECTED_ARGUMENT;
             valid = false;
+            throw new ArgsException(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT, argChar, null);
         }
     }
 
@@ -223,6 +224,12 @@ public class Args {
             this.errorParameter = errorParameter;
         }
 
+        public ArgsException(ErrorCode errorCode, char errorArgumentId, String errorParameter) {
+            this.errorCode = errorCode;
+            this.errorArgumentId = errorArgumentId;
+            this.errorParameter = errorParameter;
+        }
+
         public void setErrorArgumentId(char errorArgumentId) {
             this.errorArgumentId = errorArgumentId;
         }
@@ -260,6 +267,18 @@ public class Args {
             message.append(" unexpected.");
 
             return message.toString();
+        }
+
+        public ErrorCode getErrorCode() {
+            return errorCode;
+        }
+
+        public char getErrorArgumentId() {
+            return errorArgumentId;
+        }
+
+        public String getErrorParameter() {
+            return errorParameter;
         }
 
         public enum ErrorCode {
