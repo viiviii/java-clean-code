@@ -329,6 +329,72 @@ class ArgsTest {
         assertThat(args.errorMessage()).isEqualTo("Argument -x expects an integer but was 'Forty two'.");
     }
 
+    @DisplayName("double 값이 있는 경우")
+    @Test
+    void simpleDoublePresent() throws Exception {
+        //given
+        String schema = "x##";
+        String[] arguments = new String[]{"-x", "42.3"};
+
+        //when
+        Args args = new Args(schema, arguments);
+
+        //then
+        assertThat(args.isValid()).isTrue();
+        assertThat(args.cardinality()).isOne();
+        assertThat(args.has('x')).isTrue();
+        assertThat(args.getDouble('x')).isEqualTo(42.3);
+    }
+
+    @DisplayName("Double 값이 없는 경우")
+    @Test
+    void simpleDoubleNotPresent() throws Exception {
+        //given
+        Args args = new Args("x##", new String[]{});
+
+        //when
+        double actual = args.getDouble('y');
+
+        //then
+        assertThat(actual).isZero();
+    }
+
+    @DisplayName("Double Argument 값이 없는 경우")
+    @Test
+    void missingDouble() throws Exception {
+        //given
+        String schema = "x##";
+        String[] arguments = new String[]{"-x"}; // missing
+
+        //when
+        Args args = new Args(schema, arguments);
+
+        //then
+        assertThat(args.isValid()).isFalse();
+        assertThat(args.cardinality()).isZero();
+        assertThat(args.has('x')).isFalse();
+        assertThat(args.getDouble('x')).isZero();
+        assertThat(args.errorMessage()).isEqualTo("Could not find double parameter for -x.");
+    }
+
+    @DisplayName("Double Argument 값을 파싱할 수 없는 경우")
+    @Test
+    void invalidDouble() throws Exception {
+        //given
+        String schema = "x##";
+        String[] arguments = new String[]{"-x", "Forty two"};
+
+        //when
+        Args args = new Args(schema, arguments);
+
+        //then
+        assertThat(args.isValid()).isFalse();
+        assertThat(args.cardinality()).isZero();
+        assertThat(args.has('x')).isFalse();
+        assertThat(args.getDouble('x')).isZero();
+        assertThat(args.errorMessage()).isEqualTo("Argument -x expects an double but was 'Forty two'.");
+    }
+
     @DisplayName("잘못된 타입으로 호출한 경우")
     @Test
     void invalidType() throws Exception {
@@ -343,6 +409,7 @@ class ArgsTest {
         assertThat(args.getBoolean('x')).isFalse(); // x is type int
         assertThat(args.getString('x')).isEmpty(); // x is type int
         assertThat(args.getInt('y')).isZero(); // y is type String
+        assertThat(args.getDouble('y')).isZero(); // y is type String
     }
 
     @DisplayName("유효한 args에서 errorMessage를 조회할 경우 Excpetion이 발생한다")
