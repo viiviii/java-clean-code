@@ -212,24 +212,6 @@ class ArgsTest {
         assertThat(actual).isEmpty();
     }
 
-    @DisplayName("String Argument 값이 없는 경우")
-    @Test
-    void missingStringArgument() throws Exception {
-        //given
-        String schema = "x*";
-        String[] arguments = new String[]{"-x"}; // missing
-
-        //when
-        Exception exception = catchException(() -> new Args(schema, arguments));
-
-        //then
-        assertThat(exception).isInstanceOf(ArgsException.class);
-
-        ArgsException e = (ArgsException) exception;
-        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.MISSING_STRING);
-        assertThat(e.getErrorArgumentId()).isEqualTo('x');
-    }
-
     @DisplayName("int 값이 있는 경우")
     @Test
     void simpleIntPresent() throws Exception {
@@ -281,43 +263,6 @@ class ArgsTest {
         assertThat(actual).isZero();
     }
 
-    @DisplayName("Integer Argument 값이 없는 경우")
-    @Test
-    void missingInteger() throws Exception {
-        //given
-        String schema = "x#";
-        String[] arguments = new String[]{"-x"}; // missing
-
-        //when
-        Exception exception = catchException(() -> new Args(schema, arguments));
-
-        //then
-        assertThat(exception).isInstanceOf(ArgsException.class);
-
-        ArgsException e = (ArgsException) exception;
-        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.MISSING_INTEGER);
-        assertThat(e.getErrorArgumentId()).isEqualTo('x');
-    }
-
-    @DisplayName("Integer Argument 값을 파싱할 수 없는 경우")
-    @Test
-    void invalidInteger() throws Exception {
-        //given
-        String schema = "x#";
-        String[] arguments = new String[]{"-x", "Forty two"};
-
-        //when
-        Exception exception = catchException(() -> new Args(schema, arguments));
-
-        //then
-        assertThat(exception).isInstanceOf(ArgsException.class);
-
-        ArgsException e = (ArgsException) exception;
-        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.INVALID_INTEGER);
-        assertThat(e.getErrorArgumentId()).isEqualTo('x');
-        assertThat(e.getErrorParameter()).isEqualTo("Forty two");
-    }
-
     @DisplayName("double 값이 있는 경우")
     @Test
     void simpleDoublePresent() throws Exception {
@@ -346,43 +291,6 @@ class ArgsTest {
 
         //then
         assertThat(actual).isZero();
-    }
-
-    @DisplayName("Double Argument 값이 없는 경우")
-    @Test
-    void missingDouble() throws Exception {
-        //given
-        String schema = "x##";
-        String[] arguments = new String[]{"-x"}; // missing
-
-        //when
-        Exception exception = catchException(() -> new Args(schema, arguments));
-
-        //then
-        assertThat(exception).isInstanceOf(ArgsException.class);
-
-        ArgsException e = (ArgsException) exception;
-        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.MISSING_DOUBLE);
-        assertThat(e.getErrorArgumentId()).isEqualTo('x');
-    }
-
-    @DisplayName("Double Argument 값을 파싱할 수 없는 경우")
-    @Test
-    void invalidDouble() throws Exception {
-        //given
-        String schema = "x##";
-        String[] arguments = new String[]{"-x", "Forty two"};
-
-        //when
-        Exception exception = catchException(() -> new Args(schema, arguments));
-
-        //then
-        assertThat(exception).isInstanceOf(ArgsException.class);
-
-        ArgsException e = (ArgsException) exception;
-        assertThat(e.getErrorCode()).isEqualTo(ArgsException.ErrorCode.INVALID_DOUBLE);
-        assertThat(e.getErrorArgumentId()).isEqualTo('x');
-        assertThat(e.getErrorParameter()).isEqualTo("Forty two");
     }
 
     @DisplayName("잘못된 타입으로 호출한 경우")

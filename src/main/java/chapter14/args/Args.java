@@ -10,7 +10,6 @@ public class Args {
     private Iterator<String> currentArgument;
     private List<String> argsList;
 
-
     public Args(String schema, String[] args) throws ArgsException {
         this.schema = schema;
         argsList = Arrays.asList(args);
@@ -158,87 +157,5 @@ public class Args {
 
     public boolean isValid() {
         return valid;
-    }
-
-    private interface ArgumentMarshaler {
-        void set(Iterator<String> currentArgument) throws ArgsException;
-
-        Object get();
-    }
-
-    private class BooleanArgumentMarshaler implements ArgumentMarshaler {
-        private boolean booleanValue = false;
-
-        @Override
-        public void set(Iterator<String> currentArgument) throws ArgsException {
-            booleanValue = true;
-        }
-
-        @Override
-        public Object get() {
-            return booleanValue;
-        }
-    }
-
-    private class StringArgumentMarshaler implements ArgumentMarshaler {
-        private String stringValue = "";
-
-        @Override
-        public void set(Iterator<String> currentArgument) throws ArgsException {
-            try {
-                stringValue = currentArgument.next();
-            } catch (NoSuchElementException e) {
-                throw new ArgsException(ArgsException.ErrorCode.MISSING_STRING);
-            }
-        }
-
-        @Override
-        public Object get() {
-            return stringValue;
-        }
-    }
-
-    private class IntegerArgumentMarshaler implements ArgumentMarshaler {
-        private int intValue = 0;
-
-        @Override
-        public void set(Iterator<String> currentArgument) throws ArgsException {
-            String parameter = null;
-            try {
-                parameter = currentArgument.next();
-                intValue = Integer.parseInt(parameter);
-            } catch (NoSuchElementException e) {
-                throw new ArgsException(ArgsException.ErrorCode.MISSING_INTEGER);
-            } catch (NumberFormatException e) {
-                throw new ArgsException(ArgsException.ErrorCode.INVALID_INTEGER, parameter);
-            }
-        }
-
-        @Override
-        public Object get() {
-            return intValue;
-        }
-    }
-
-    private class DoubleArgumentMarshaler implements ArgumentMarshaler {
-        private double doubleValue = 0;
-
-        @Override
-        public void set(Iterator<String> currentArgument) throws ArgsException {
-            String parameter = null;
-            try {
-                parameter = currentArgument.next();
-                doubleValue = Double.parseDouble(parameter);
-            } catch (NoSuchElementException e) {
-                throw new ArgsException(ArgsException.ErrorCode.MISSING_DOUBLE, parameter);
-            } catch (NumberFormatException e) {
-                throw new ArgsException(ArgsException.ErrorCode.INVALID_DOUBLE, parameter);
-            }
-        }
-
-        @Override
-        public Object get() {
-            return doubleValue;
-        }
     }
 }
