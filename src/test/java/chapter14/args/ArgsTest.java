@@ -19,13 +19,12 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isZero();
     }
 
     @DisplayName("schema가 없고 argument가 1개 있는 경우")
     @Test
-    void noSchemaButWithOneArgument() throws Exception {
+    void noSchemaButWithOneArgument() {
         //given
         String schema = "";
         String[] arguments = new String[]{"-x"};
@@ -52,7 +51,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isZero();
         assertThat(args.has('x')).isFalse();
         assertThat(args.has('y')).isFalse();
@@ -105,7 +103,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isEqualTo(2);
         assertThat(args.has('x')).isTrue();
         assertThat(args.has('y')).isTrue();
@@ -122,7 +119,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isOne();
         assertThat(args.getBoolean('x')).isTrue();
     }
@@ -138,7 +134,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isEqualTo(2);
         assertThat(args.has('x')).isTrue();
         assertThat(args.has('y')).isTrue();
@@ -172,7 +167,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isOne();
         assertThat(args.has('x')).isTrue();
         assertThat(args.getString('x')).isEqualTo("param");
@@ -189,7 +183,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isEqualTo(2);
         assertThat(args.has('x')).isTrue();
         assertThat(args.has('y')).isTrue();
@@ -223,7 +216,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isOne();
         assertThat(args.has('x')).isTrue();
         assertThat(args.getInt('x')).isEqualTo(42);
@@ -240,7 +232,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isEqualTo(2);
         assertThat(args.has('x')).isTrue();
         assertThat(args.has('y')).isTrue();
@@ -274,7 +265,6 @@ class ArgsTest {
         Args args = new Args(schema, arguments);
 
         //then
-        assertThat(args.isValid()).isTrue();
         assertThat(args.cardinality()).isOne();
         assertThat(args.has('x')).isTrue();
         assertThat(args.getDouble('x')).isEqualTo(42.3);

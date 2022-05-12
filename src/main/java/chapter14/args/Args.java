@@ -4,7 +4,6 @@ import java.util.*;
 
 public class Args {
     private String schema;
-    private boolean valid = true;
     private Map<Character, ArgumentMarshaler> marshalers = new HashMap<>();
     private Set<Character> argsFound = new HashSet<>();
     private Iterator<String> currentArgument;
@@ -13,15 +12,12 @@ public class Args {
     public Args(String schema, String[] args) throws ArgsException {
         this.schema = schema;
         argsList = Arrays.asList(args);
-        valid = parse();
+        parse();
     }
 
-    private boolean parse() throws ArgsException {
-        if (schema.length() == 0 && argsList.size() == 0)
-            return true;
+    private void parse() throws ArgsException {
         parseSchema();
         parseArguments();
-        return valid;
     }
 
     private boolean parseSchema() throws ArgsException {
@@ -60,12 +56,11 @@ public class Args {
         }
     }
 
-    private boolean parseArguments() throws ArgsException {
+    private void parseArguments() throws ArgsException {
         for (currentArgument = argsList.iterator(); currentArgument.hasNext(); ) {
             String arg = currentArgument.next();
             parseArgument(arg);
         }
-        return true;
     }
 
     private void parseArgument(String arg) throws ArgsException {
@@ -83,7 +78,6 @@ public class Args {
         if (setArgument(argChar))
             argsFound.add(argChar);
         else {
-            valid = false;
             throw new ArgsException(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT, argChar, null);
         }
     }
@@ -96,7 +90,6 @@ public class Args {
             m.set(currentArgument);
             return true;
         } catch (ArgsException e) {
-            valid = false;
             e.setErrorArgumentId(argChar);
             throw e;
         }
@@ -153,9 +146,5 @@ public class Args {
 
     public boolean has(char arg) {
         return argsFound.contains(arg);
-    }
-
-    public boolean isValid() {
-        return valid;
     }
 }
