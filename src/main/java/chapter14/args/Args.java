@@ -203,7 +203,6 @@ public class Args {
     }
 
     public static class ArgsException extends Exception {
-        private Set<Character> unexpectedArguments = new TreeSet<>();
         private char errorArgumentId = '\0';
         private String errorParameter = "TILT";
         private ArgsException.ErrorCode errorCode = ArgsException.ErrorCode.OK;
@@ -239,7 +238,8 @@ public class Args {
                 case OK:
                     throw new Exception("TILT: Should not get here.");
                 case UNEXPECTED_ARGUMENT:
-                    return unexpectedArgumentMessage();
+                    return String.format("Argument(s) -%c unexpected.",
+                            errorArgumentId);
                 case MISSING_STRING:
                     return String.format("Could not find string parameter for -%c.",
                             errorArgumentId);
@@ -257,16 +257,6 @@ public class Args {
                             errorArgumentId);
             }
             return "";
-        }
-
-        private String unexpectedArgumentMessage() {
-            StringBuffer message = new StringBuffer("Argument(s) -");
-            for (char c : unexpectedArguments) {
-                message.append(c);
-            }
-            message.append(" unexpected.");
-
-            return message.toString();
         }
 
         public ErrorCode getErrorCode() {
