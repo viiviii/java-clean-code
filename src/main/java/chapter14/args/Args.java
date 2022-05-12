@@ -78,10 +78,6 @@ public class Args {
         }
     }
 
-    public int cardinality() {
-        return argsFound.size();
-    }
-
     public boolean getBoolean(char arg) {
         ArgumentMarshaler am = marshalers.get(arg);
         boolean b = false;
