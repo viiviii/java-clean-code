@@ -98,13 +98,6 @@ public class Args {
         return argsFound.size();
     }
 
-    public String usage() {
-        if (schema.length() > 0)
-            return "-[" + schema + "]";
-        else
-            return "";
-    }
-
     public boolean getBoolean(char arg) {
         ArgumentMarshaler am = marshalers.get(arg);
         boolean b = false;
