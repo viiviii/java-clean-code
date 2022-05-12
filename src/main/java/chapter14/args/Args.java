@@ -80,40 +80,22 @@ public class Args {
 
     public boolean getBoolean(char arg) {
         ArgumentMarshaler am = marshalers.get(arg);
-        boolean b = false;
-        try {
-            b = am != null && (Boolean) am.get();
-        } catch (ClassCastException e) {
-            b = false;
-        }
-        return b;
+        return BooleanArgumentMarshaler.getValue(am);
     }
 
     public String getString(char arg) {
         ArgumentMarshaler am = marshalers.get(arg);
-        try {
-            return am == null ? "" : (String) am.get();
-        } catch (ClassCastException e) {
-            return "";
-        }
+        return StringArgumentMarshaler.getValue(am);
     }
 
     public int getInt(char arg) {
         ArgumentMarshaler am = marshalers.get(arg);
-        try {
-            return am == null ? 0 : (Integer) am.get();
-        } catch (ClassCastException e) {
-            return 0;
-        }
+        return IntegerArgumentMarshaler.getValue(am);
     }
 
     public double getDouble(char arg) {
         ArgumentMarshaler am = marshalers.get(arg);
-        try {
-            return am == null ? 0.0 : (Double) am.get();
-        } catch (ClassCastException e) {
-            return 0.0;
-        }
+        return DoubleArgumentMarshaler.getValue(am);
     }
 
     public boolean has(char arg) {

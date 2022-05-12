@@ -21,4 +21,12 @@ public class StringArgumentMarshaler implements ArgumentMarshaler {
     public Object get() {
         return stringValue;
     }
+
+    public static String getValue(ArgumentMarshaler am) {
+        try {
+            return am == null ? "" : (String) am.get();
+        } catch (ClassCastException e) {
+            return "";
+        }
+    }
 }

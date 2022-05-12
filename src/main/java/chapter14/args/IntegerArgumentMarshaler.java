@@ -26,4 +26,12 @@ public class IntegerArgumentMarshaler implements ArgumentMarshaler {
     public Object get() {
         return intValue;
     }
+
+    public static int getValue(ArgumentMarshaler am) {
+        try {
+            return am == null ? 0 : (Integer) am.get();
+        } catch (ClassCastException e) {
+            return 0;
+        }
+    }
 }
