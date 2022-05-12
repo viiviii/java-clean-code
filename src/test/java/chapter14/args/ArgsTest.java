@@ -3,8 +3,6 @@ package chapter14.args;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.text.ParseException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 
@@ -90,7 +88,7 @@ class ArgsTest {
 
         //then
         assertThat(exception)
-                .isInstanceOf(ParseException.class)
+                .isInstanceOf(Args.ArgsException.class)
                 .hasMessage("Bad character: * in Args format: *");
     }
 
@@ -106,7 +104,7 @@ class ArgsTest {
 
         //then
         assertThat(exception)
-                .isInstanceOf(ParseException.class)
+                .isInstanceOf(Args.ArgsException.class)
                 .hasMessage("Argument: f has invalid format: ~.");
     }
 

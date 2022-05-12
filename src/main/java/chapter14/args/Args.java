@@ -1,6 +1,5 @@
 package chapter14.args;
 
-import java.text.ParseException;
 import java.util.*;
 
 public class Args {
@@ -16,13 +15,13 @@ public class Args {
     private List<String> argsList;
 
 
-    public Args(String schema, String[] args) throws ParseException {
+    public Args(String schema, String[] args) throws ArgsException {
         this.schema = schema;
         argsList = Arrays.asList(args);
         valid = parse();
     }
 
-    private boolean parse() throws ParseException {
+    private boolean parse() throws ArgsException {
         if (schema.length() == 0 && argsList.size() == 0)
             return true;
         parseSchema();
@@ -33,7 +32,7 @@ public class Args {
         return valid;
     }
 
-    private boolean parseSchema() throws ParseException {
+    private boolean parseSchema() throws ArgsException {
         for (String element : schema.split(",")) {
             if (element.length() > 0) {
                 String trimmedElement = element.trim();
@@ -43,7 +42,7 @@ public class Args {
         return true;
     }
 
-    private void parseSchemaElement(String element) throws ParseException {
+    private void parseSchemaElement(String element) throws ArgsException {
         char elementId = element.charAt(0);
         String elementTail = element.substring(1);
         validateSchemaElementId(elementId);
@@ -56,16 +55,16 @@ public class Args {
         } else if (elementTail.equals("##")) {
             marshalers.put(elementId, new DoubleArgumentMarshaler());
         } else {
-            throw new ParseException(
+            throw new ArgsException(
                     String.format("Argument: %c has invalid format: %s.",
-                            elementId, elementTail), 0);
+                            elementId, elementTail));
         }
     }
 
-    private void validateSchemaElementId(char elementId) throws ParseException {
+    private void validateSchemaElementId(char elementId) throws ArgsException {
         if (!Character.isLetter(elementId)) {
-            throw new ParseException(
-                    "Bad character: " + elementId + " in Args format: " + schema, 0);
+            throw new ArgsException(
+                    "Bad character: " + elementId + " in Args format: " + schema);
         }
     }
 
@@ -146,7 +145,6 @@ public class Args {
                         errorArgumentId);
         }
         return "";
-
     }
 
     private String unexpectedArgumentMessage() {
@@ -205,7 +203,19 @@ public class Args {
         return valid;
     }
 
-    private static class ArgsException extends Exception {
+    public static class ArgsException extends Exception {
+
+        public ArgsException() {
+        }
+
+        public ArgsException(String message) {
+            super(message);
+        }
+
+        public String errorMessage() {
+            return super.getMessage();
+        }
+
         public enum ErrorCode {
             OK, MISSING_STRING, MISSING_INTEGER, INVALID_INTEGER,
             UNEXPECTED_ARGUMENT, MISSING_DOUBLE, INVALID_DOUBLE
