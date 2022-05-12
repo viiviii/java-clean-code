@@ -31,28 +31,15 @@ class ArgsTest {
         String[] arguments = new String[]{"-x"};
 
         //when
-        Args args = new Args(schema, arguments);
+        Exception exception = catchException(() -> new Args(schema, arguments));
 
         //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Argument(s) -x unexpected.");
-    }
+        assertThat(exception).isInstanceOf(Args.ArgsException.class);
 
-    @DisplayName("schema가 없고 argument가 여러 개 있는 경우")
-    @Test
-    void noSchemaButWithMultipleArguments() throws Exception {
-        //given
-        String schema = "";
-        String[] arguments = new String[]{"-x", "-y"};
-
-        //when
-        Args args = new Args(schema, arguments);
-
-        //then
-        assertThat(args.isValid()).isFalse();
-        assertThat(args.cardinality()).isZero();
-        assertThat(args.errorMessage()).isEqualTo("Argument(s) -xy unexpected.");
+        Args.ArgsException e = (Args.ArgsException) exception;
+        assertThat(e.errorMessage()).isEqualTo("Argument(s) -x unexpected.");
+        assertThat(e.getErrorCode()).isEqualTo(Args.ArgsException.ErrorCode.UNEXPECTED_ARGUMENT);
+        assertThat(e.getErrorArgumentId()).isEqualTo('x');
     }
 
     @DisplayName("Schema가 있고, arugment가 없는 경우")
