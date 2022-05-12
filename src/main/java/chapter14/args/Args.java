@@ -6,13 +6,10 @@ public class Args {
     private Map<Character, ArgumentMarshaler> marshalers = new HashMap<>();
     private Set<Character> argsFound = new HashSet<>();
     private Iterator<String> currentArgument;
-    private List<String> argsList;
 
     public Args(String schema, String[] args) throws ArgsException {
-        argsList = Arrays.asList(args);
-
         parseSchema(schema);
-        parseArguments();
+        parseArgumentStrings(Arrays.asList(args));
     }
 
     private void parseSchema(String schema) throws ArgsException {
@@ -48,7 +45,7 @@ public class Args {
         }
     }
 
-    private void parseArguments() throws ArgsException {
+    private void parseArgumentStrings(List<String> argsList) throws ArgsException {
         for (currentArgument = argsList.iterator(); currentArgument.hasNext(); ) {
             String arg = currentArgument.next();
             parseArgument(arg);
