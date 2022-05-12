@@ -119,39 +119,15 @@ public class Args {
             if (m instanceof BooleanArgumentMarshaler)
                 m.set(currentArgument);
             else if (m instanceof StringArgumentMarshaler)
-                setStringArg(m);
+                m.set(currentArgument);
             else if (m instanceof IntegerArgumentMarshaler)
-                setIntArg(m);
+                m.set(currentArgument);
         } catch (ArgsException e) {
             valid = false;
             errorArgumentId = argChar;
             throw e;
         }
         return true;
-    }
-
-    private void setIntArg(ArgumentMarshaler m) throws ArgsException {
-        String parameter = null;
-        try {
-            parameter = currentArgument.next();
-            m.set(parameter);
-        } catch (NoSuchElementException e) {
-            errorCode = ErrorCode.MISSING_INTEGER;
-            throw new ArgsException();
-        } catch (ArgsException e) {
-            errorParameter = parameter;
-            errorCode = ErrorCode.INVALID_INTEGER;
-            throw e;
-        }
-    }
-
-    private void setStringArg(ArgumentMarshaler m) throws ArgsException {
-        try {
-            m.set(currentArgument.next());
-        } catch (NoSuchElementException e) {
-            errorCode = ErrorCode.MISSING_STRING;
-            throw new ArgsException();
-        }
     }
 
     public int cardinality() {
@@ -266,11 +242,16 @@ public class Args {
 
         @Override
         public void set(Iterator<String> currentArgument) throws ArgsException {
+            try {
+                stringValue = currentArgument.next();
+            } catch (NoSuchElementException e) {
+                errorCode = ErrorCode.MISSING_STRING;
+                throw new ArgsException();
+            }
         }
 
         @Override
         public void set(String s) {
-            stringValue = s;
         }
 
         @Override
@@ -284,15 +265,22 @@ public class Args {
 
         @Override
         public void set(Iterator<String> currentArgument) throws ArgsException {
+            String parameter = null;
+            try {
+                parameter = currentArgument.next();
+                intValue = Integer.parseInt(parameter);
+            } catch (NoSuchElementException e) {
+                errorCode = ErrorCode.MISSING_INTEGER;
+                throw new ArgsException();
+            } catch (NumberFormatException e) {
+                errorParameter = parameter;
+                errorCode = ErrorCode.INVALID_INTEGER;
+                throw new ArgsException();
+            }
         }
 
         @Override
         public void set(String s) throws ArgsException {
-            try {
-                intValue = Integer.parseInt(s);
-            } catch (NumberFormatException e) {
-                throw new ArgsException();
-            }
         }
 
         @Override
