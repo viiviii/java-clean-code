@@ -5,7 +5,7 @@ import java.util.*;
 public class Args {
     private Map<Character, ArgumentMarshaler> marshalers = new HashMap<>();
     private Set<Character> argsFound = new HashSet<>();
-    private Iterator<String> currentArgument;
+    private ListIterator<String> currentArgument;
 
     public Args(String schema, String[] args) throws ArgsException {
         parseSchema(schema);
@@ -46,42 +46,35 @@ public class Args {
     }
 
     private void parseArgumentStrings(List<String> argsList) throws ArgsException {
-        for (currentArgument = argsList.iterator(); currentArgument.hasNext(); ) {
-            String arg = currentArgument.next();
-            parseArgument(arg);
+        for (currentArgument = argsList.listIterator(); currentArgument.hasNext(); ) {
+            String argString = currentArgument.next();
+            if (argString.startsWith("-")) {
+                parseArgumentCharacters(argString.substring(1));
+            } else {
+                currentArgument.previous();
+                break;
+            }
         }
     }
 
-    private void parseArgument(String arg) throws ArgsException {
-        if (arg.startsWith("-"))
-            parseElements(arg);
-    }
-
-    private void parseElements(String arg) throws ArgsException {
-        for (int i = 1; i < arg.length(); i++) {
-            parseElement(arg.charAt(i));
+    private void parseArgumentCharacters(String argChars) throws ArgsException {
+        for (int i = 0; i < argChars.length(); i++) {
+            parseArgumentCharacter(argChars.charAt(i));
         }
     }
 
-    private void parseElement(char argChar) throws ArgsException {
-        if (setArgument(argChar))
-            argsFound.add(argChar);
-        else {
-            throw new ArgsException(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT,
-                    argChar, null);
-        }
-    }
-
-    private boolean setArgument(char argChar) throws ArgsException {
+    private void parseArgumentCharacter(char argChar) throws ArgsException {
         ArgumentMarshaler m = marshalers.get(argChar);
-        if (m == null)
-            return false;
-        try {
-            m.set(currentArgument);
-            return true;
-        } catch (ArgsException e) {
-            e.setErrorArgumentId(argChar);
-            throw e;
+        if (m == null) {
+            throw new ArgsException(ArgsException.ErrorCode.UNEXPECTED_ARGUMENT, argChar, null);
+        } else {
+            argsFound.add(argChar);
+            try {
+                m.set(currentArgument);
+            } catch (ArgsException e) {
+                e.setErrorArgumentId(argChar);
+                throw e;
+            }
         }
     }
 
@@ -129,5 +122,9 @@ public class Args {
 
     public boolean has(char arg) {
         return argsFound.contains(arg);
+    }
+
+    public int nextArgument() {
+        return currentArgument.nextIndex();
     }
 }
