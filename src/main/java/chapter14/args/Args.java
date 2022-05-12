@@ -25,10 +25,7 @@ public class Args {
         if (schema.length() == 0 && argsList.size() == 0)
             return true;
         parseSchema();
-        try {
-            parseArguments();
-        } catch (ArgsException e) {
-        }
+        parseArguments();
         return valid;
     }
 
